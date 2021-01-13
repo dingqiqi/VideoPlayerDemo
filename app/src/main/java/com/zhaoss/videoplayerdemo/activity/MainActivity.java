@@ -26,19 +26,17 @@ public class MainActivity extends BaseActivity {
     private MediaPlayerTool mMediaPlayerTool;
     private ArrayList<MainVideoBean> dataList;
 
-    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         rv_video = findViewById(R.id.rv_video);
-
         rv_video.setLayoutManager(new LinearLayoutManager(mContext));
         dataList = DataUtil.createData();
         rv_video.setAdapter(new MainAdapter(this, dataList));
 
-        rv_video.addItemDecoration(new RecyclerView.ItemDecoration(){
+        rv_video.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
 
@@ -52,19 +50,20 @@ public class MainActivity extends BaseActivity {
         rv_video.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if(currentPlayView!=null){
+                if (currentPlayView != null) {
                     boolean playRange = isPlayRange(currentPlayView, recyclerView);
-                    if(!playRange){
+                    if (!playRange) {
                         mMediaPlayerTool.reset();
                     }
                 }
             }
+
             @Override
             public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
                 if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                     //检测播放视频
                     checkPlayVideo();
-                    if(currentPlayView == null){
+                    if (currentPlayView == null) {
                         playVideoByPosition(-1);
                     }
                 }
@@ -77,6 +76,7 @@ public class MainActivity extends BaseActivity {
             @Override
             public void onSucceed(int requestCode, @NonNull List<String> grantPermissions) {
             }
+
             @Override
             public void onFailed(int requestCode, @NonNull List<String> deniedPermissions) {
 
@@ -85,17 +85,18 @@ public class MainActivity extends BaseActivity {
     }
 
     boolean isFirst = true;
+
     @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
-        if(isFirst){
+        if (isFirst) {
             isFirst = false;
             refreshVideo();
         }
     }
 
     //检测是否播放视频
-    private void checkPlayVideo(){
+    private void checkPlayVideo() {
 
         currentPlayIndex = 0;
         videoPositionList.clear();
@@ -104,9 +105,9 @@ public class MainActivity extends BaseActivity {
         for (int x = 0; x < childCount; x++) {
             View childView = rv_video.getChildAt(x);
             boolean playRange = isPlayRange(childView.findViewById(R.id.rl_video), rv_video);
-            if(playRange){
+            if (playRange) {
                 int position = rv_video.getChildAdapterPosition(childView);
-                if(position>=0 && !videoPositionList.contains(position)){
+                if (position >= 0 && !videoPositionList.contains(position)) {
                     videoPositionList.add(position);
                 }
             }
@@ -114,9 +115,9 @@ public class MainActivity extends BaseActivity {
     }
 
     //检查子view是否在父view显示布局里面
-    private boolean isPlayRange(View childView, View parentView){
+    private boolean isPlayRange(View childView, View parentView) {
 
-        if(childView==null || parentView==null){
+        if (childView == null || parentView == null) {
             return false;
         }
 
@@ -126,8 +127,8 @@ public class MainActivity extends BaseActivity {
         int[] parentLocal = new int[2];
         parentView.getLocationOnScreen(parentLocal);
 
-        boolean playRange = childLocal[1]>=parentLocal[1] &&
-                childLocal[1]<=parentLocal[1]+parentView.getHeight()-childView.getHeight();
+        boolean playRange = childLocal[1] >= parentLocal[1] &&
+                childLocal[1] <= parentLocal[1] + parentView.getHeight() - childView.getHeight();
 
         return playRange;
     }
@@ -138,28 +139,30 @@ public class MainActivity extends BaseActivity {
     //可以播放的视频集合
     ArrayList<Integer> videoPositionList = new ArrayList<>();
     View currentPlayView;
+
     /**
      * 播放视频
+     *
      * @param resumePosition 是否继续播放 否则可以传-1
      */
-    private void playVideoByPosition(int resumePosition){
+    private void playVideoByPosition(int resumePosition) {
 
         boolean isResumePlay = resumePosition >= 0;
 
-        if(!isResumePlay && (videoPositionList.size()==0 || mMediaPlayerTool ==null)){
-            return ;
+        if (!isResumePlay && (videoPositionList.size() == 0 || mMediaPlayerTool == null)) {
+            return;
         }
 
-        if(!isResumePlay){
+        if (!isResumePlay) {
             //一定要先重置播放器
             mMediaPlayerTool.reset();
         }
 
         int playPosition = 0;
-        if(isResumePlay){
+        if (isResumePlay) {
             playPosition = resumePosition;
-        }else{
-            if(currentPlayIndex >= videoPositionList.size()){
+        } else {
+            if (currentPlayIndex >= videoPositionList.size()) {
                 currentPlayIndex = 0;
             }
             playPosition = videoPositionList.get(currentPlayIndex);
@@ -167,19 +170,19 @@ public class MainActivity extends BaseActivity {
 
         //根据传进来的position找到对应的ViewHolder
         final MainAdapter.MyViewHolder vh = (MainAdapter.MyViewHolder) rv_video.findViewHolderForAdapterPosition(playPosition);
-        if(vh == null){
-            return ;
+        if (vh == null) {
+            return;
         }
 
         currentPlayView = vh.rl_video;
 
         //初始化一些播放状态, 如进度条,播放按钮,加载框等
-        if(isResumePlay){
+        if (isResumePlay) {
             vh.pb_video.setVisibility(View.GONE);
             vh.iv_play_icon.setVisibility(View.GONE);
             vh.iv_cover.setVisibility(View.GONE);
             vh.playTextureView.setVideoSize(mMediaPlayerTool.getVideoWidth(), mMediaPlayerTool.getVideoHeight());
-        }else{
+        } else {
             //显示正在加载的界面
             vh.iv_play_icon.setVisibility(View.GONE);
             vh.pb_video.setVisibility(View.VISIBLE);
@@ -207,6 +210,7 @@ public class MainActivity extends BaseActivity {
                 vh.playTextureView.setVideoSize(mMediaPlayerTool.getVideoWidth(), mMediaPlayerTool.getVideoHeight());
                 vh.iv_play_icon.setVisibility(View.GONE);
             }
+
             @Override
             public void onStop() {
                 vh.pb_video.setVisibility(View.GONE);
@@ -215,15 +219,18 @@ public class MainActivity extends BaseActivity {
                 vh.tv_play_time.setText("");
                 currentPlayView = null;
             }
+
             @Override
             public void onCompletion() {
                 currentPlayIndex++;
                 playVideoByPosition(-1);
             }
+
             @Override
             public void onRotationInfo(int rotation) {
                 vh.playTextureView.setRotation(rotation);
             }
+
             @Override
             public void onPlayProgress(long currentPosition) {
                 String date = Util.fromMMss(mMediaPlayerTool.getDuration() - currentPosition);
@@ -232,12 +239,12 @@ public class MainActivity extends BaseActivity {
         };
         mMediaPlayerTool.setVideoListener(myVideoListener);
 
-        if(isResumePlay){
+        if (isResumePlay) {
             //把播放器当前绑定的SurfaceTexture取出起来, 设置给当前界面的TextureView
             vh.playTextureView.resetTextureView(mMediaPlayerTool.getAvailableSurfaceTexture());
             mMediaPlayerTool.setPlayTextureView(vh.playTextureView);
             vh.playTextureView.postInvalidate();
-        }else {
+        } else {
             vh.playTextureView.resetTextureView();
             mMediaPlayerTool.setPlayTextureView(vh.playTextureView);
             mMediaPlayerTool.setSurfaceTexture(vh.playTextureView.getSurfaceTexture());
@@ -247,13 +254,14 @@ public class MainActivity extends BaseActivity {
 
     //跳转页面时是否关闭播放器
     private int jumpVideoPosition = -1;
-    public void jumpNotCloseMediaPlay(int position){
+
+    public void jumpNotCloseMediaPlay(int position) {
         jumpVideoPosition = position;
     }
 
-    public void refreshVideo(){
+    public void refreshVideo() {
 
-        if(mMediaPlayerTool !=null) {
+        if (mMediaPlayerTool != null) {
             mMediaPlayerTool.reset();
             checkPlayVideo();
             playVideoByPosition(-1);
@@ -265,11 +273,11 @@ public class MainActivity extends BaseActivity {
         super.onResume();
 
         //检测是否继续播放视频
-        if(jumpVideoPosition!=-1 &&
-                (videoPositionList.size()>currentPlayIndex && jumpVideoPosition==videoPositionList.get(currentPlayIndex))
-                && mMediaPlayerTool!=null && mMediaPlayerTool.isPlaying()){
+        if (jumpVideoPosition != -1 &&
+                (videoPositionList.size() > currentPlayIndex && jumpVideoPosition == videoPositionList.get(currentPlayIndex))
+                && mMediaPlayerTool != null && mMediaPlayerTool.isPlaying()) {
             playVideoByPosition(jumpVideoPosition);
-        }else{
+        } else {
             refreshVideo();
         }
         jumpVideoPosition = -1;
@@ -280,9 +288,9 @@ public class MainActivity extends BaseActivity {
     protected void onPause() {
         super.onPause();
 
-        if(mMediaPlayerTool != null) {
+        if (mMediaPlayerTool != null) {
             //如果要跳转播放, 那么不关闭播放器
-            if (videoPositionList.size()>currentPlayIndex && jumpVideoPosition==videoPositionList.get(currentPlayIndex)) {
+            if (videoPositionList.size() > currentPlayIndex && jumpVideoPosition == videoPositionList.get(currentPlayIndex)) {
                 rv_video.postDelayed(new Runnable() {
                     @Override
                     public void run() {
