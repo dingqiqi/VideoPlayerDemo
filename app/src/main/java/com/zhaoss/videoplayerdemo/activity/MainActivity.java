@@ -27,6 +27,7 @@ public class MainActivity extends BaseActivity {
     private ArrayList<MainVideoBean> dataList;
 
 
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
