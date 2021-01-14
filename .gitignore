@@ -7,3 +7,7 @@
 /build
 /captures
 .externalNativeBuild
+checkStyle/checkstyle-8.14-all.jar
+checkStyle/custom_alibaba_checkstyle.xml
+checkStyle/pre-commit
+checkStyle/UpdateCheckStyleLib-1.0.0.jar
