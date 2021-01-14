@@ -25,8 +25,6 @@ public class MainActivity extends BaseActivity {
     private RecyclerView rv_video;
     private MediaPlayerTool mMediaPlayerTool;
     private ArrayList<MainVideoBean> dataList;
-
-
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
